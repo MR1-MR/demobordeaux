@@ -28,8 +28,10 @@ db.connect((err) => {
 });
 
 app.get("/user", (req, res) => {
+  const email = req.query.email;
   db.query(
-    "SELECT * FROM users WHERE email = '" + req.query.email + "'",
+    "SELECT * FROM users WHERE email = ?",
+    [email],
     (err, result) => {
       if (err) throw err;
       res.json(result);
@@ -37,13 +39,15 @@ app.get("/user", (req, res) => {
   );
 });
 
+
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: "Email et mot de passe requis" });
   }
   db.query(
-    "SELECT * FROM users WHERE email = '" + email + "'",
+    "SELECT * FROM users WHERE email = ?",
+    [email],
     (err, results) => {
       if (err || results.length === 0) {
         return res.status(401).json({ error: "Utilisateur non trouvé" });
